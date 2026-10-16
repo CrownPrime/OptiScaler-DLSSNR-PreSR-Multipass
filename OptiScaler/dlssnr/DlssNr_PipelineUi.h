@@ -74,7 +74,7 @@ inline void DrawTimingBar(double nrMs, double frameMs)
     const bool overlapping = nrMs > frameMs;
     ImGui::TextWrapped("NR %.2f ms  |  Rest of frame ~%.2f ms", nrMs, remaining);
     const auto text = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(text.x * 0.20f, text.y * 0.55f, text.z * 0.25f, text.w));
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(text.x * 0.72f, text.y * 0.60f, text.z * 0.34f, text.w));
     ImGui::ProgressBar(float(nrMs / std::max(frameMs, nrMs)), ImVec2(-1.0f, ImGui::GetFontSize()), "");
     ImGui::PopStyleColor();
     if (ImGui::IsItemHovered())
@@ -220,7 +220,7 @@ inline void Draw(const View& view, Section& selected)
         {
             // Preserve the theme's HDR brightness and interaction states, changing only the hue.
             const float brightness = std::max({ fill.x, fill.y, fill.z });
-            fill = ImVec4(brightness * 0.20f, brightness * 0.65f, brightness * 0.30f, fill.w);
+            fill = ImVec4(brightness * 0.66f, brightness * 0.52f, brightness * 0.24f, fill.w); // CrownPrime gold
         }
         draw->AddRectFilled(at, ImVec2(at.x + nodeWidth, at.y + height), ImGui::GetColorU32(fill),
                             ImGui::GetStyle().FrameRounding);

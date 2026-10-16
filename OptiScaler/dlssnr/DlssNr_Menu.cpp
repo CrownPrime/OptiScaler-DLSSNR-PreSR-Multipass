@@ -96,10 +96,10 @@ static void RenderStatus(Config* config)
         // Hiding the edit keeps model evaluation running.
         const char* runSuffix = !config->DlssNrApplyModel.value_or_default() ? "  (model running, edit hidden)" : "";
 
-        // Keep the running indicator green, using the theme's HDR-adjusted text brightness.
+        // Keep the running indicator gold (CrownPrime), using the theme's HDR-adjusted text brightness.
         const auto textColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);
         ImGui::PushStyleColor(ImGuiCol_Text,
-                              ImVec4(textColor.x * 0.55f, textColor.y * 0.80f, textColor.z * 0.55f, textColor.w));
+                              ImVec4(textColor.x * 0.92f, textColor.y * 0.76f, textColor.z * 0.44f, textColor.w));
         if (ms.has_value())
             ImGui::Text("Running%s - %.2f ms elapsed%s", vulkan ? " natively on Vulkan" : "", ms.value(), runSuffix);
         else if (vulkan)

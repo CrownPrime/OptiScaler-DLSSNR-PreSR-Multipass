@@ -268,6 +268,28 @@ class Config
     CustomOptional<bool> DlssNrResidualAcrossRr { false };
     // RR history blend before private upscaling, clamped to 0.01..1.
     CustomOptional<float> DlssNrResidualAcrossRrBlend { 0.08f };
+    // Denoise first: run the game's own upscaler (RR when the game uses RR, else SR) at 1:1 on the
+    // raw render, run NR on that clean image, then hand the result on through one second step.
+    CustomOptional<bool> DlssNrDenoiseFirst { false };
+    // 0 game upscaler again on the NR'd clean image (zero jitter), 1 private DLSS SR on it (zero
+    // jitter), 2 NR's edit shifted by the jitter and added onto the raw render, then the game's upscale.
+    CustomOptional<int> DlssNrDenoiseFirstStep { 2 };
+    // Step 2 only. 0 difference (NR - clean, added), 1 ratio (NR / clean, multiplied). Ratio is the
+    // default: a path-traced sample is a lottery around the clean value, and an absolute edit sized
+    // for the clean value recolours the samples that came back dark, which doubles the colour noise
+    // RR receives. A gain keeps every sample's own hue.
+    CustomOptional<int> DlssNrDenoiseFirstEdit { 1 };
+    // Step 2 only. Resampling kernel for the shifted edit: 0 bilinear, 1 Catmull-Rom, 2 Lanczos 2.
+    CustomOptional<int> DlssNrDenoiseFirstKernel { 1 };
+    // Step 2 only. Shift the edit by the frame's jitter so it lines up with the raw render's samples.
+    CustomOptional<bool> DlssNrDenoiseFirstShift { true };
+    // Step 2 only. Flip the sign of that shift; engines disagree on the jitter convention.
+    CustomOptional<bool> DlssNrDenoiseFirstFlipJitter { false };
+    // Step 2 only. Clamp the resampled edit to its nearest source pixels, which removes ringing.
+    CustomOptional<bool> DlssNrDenoiseFirstNeighbourhoodClamp { false };
+    // Step 2, ratio only. Do not multiply samples far brighter than the clean value (fireflies); give
+    // them the absolute change their pixel would have had. Off = plain ratio, for comparison.
+    CustomOptional<bool> DlssNrDenoiseFirstFireflyGuard { true };
     CustomOptional<int> DlssNrToggleKey { UnboundKey };
     CustomOptional<uint32_t> DlssNrPreset { 0 };
     CustomOptional<float> DlssNrIntensity { 1.0f };
@@ -286,6 +308,17 @@ class Config
     CustomOptional<float> DlssNrEnvironmentColour { 1.0f };
     CustomOptional<bool> DlssNrShowSkinMask { false };
     CustomOptional<bool> DlssNrUnlockPasses { false };
+    // Below-native WorkingScale: resample depth and motion to the model's working size, so the
+    // guides and the colour it reprojects agree pixel for pixel. Off hands the model full-size
+    // guides for a smaller colour, which is what flickered at every scale below 100%.
+    CustomOptional<bool> DlssNrMatchGuides { true };
+    // The model's motion-vector scale converts the game's units to pixels of the motion texture the
+    // model is handed (the matched working-size resample, or the game's own region), measured
+    // against the size the vectors come in: the render size for low-resolution vectors, the output
+    // size otherwise (the DLSS-enlargement path's formula). Off restores the old conversion,
+    // working size / frame size, which halved every vector below 100% in a game upscaling 2x with
+    // low-resolution vectors.
+    CustomOptional<bool> DlssNrRenderMotionScale { true };
     // Passes 2..30 inherit pass 1, except LocalTone defaults to zero.
     struct NrPassOverrides
     {

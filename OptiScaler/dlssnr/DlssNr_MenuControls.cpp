@@ -271,6 +271,36 @@ static void DeferredSlider(const char* label, Option* opt, float mn, float mx, f
         HelpMarker("Skin detail. -1 follows Local structure.");
 }
 
+template <typename Option> static void NrModelCombo(Option* opt, bool allowInherit)
+{
+    static const char* names[] = { "Automatic", "Original", "Optimized" };
+    const bool inherited = allowInherit && !opt->has_value();
+    const uint32_t preset = opt->has_value() ? opt->value() : 0u;
+    const char* preview = inherited                      ? "Inherit pass 1"
+                          : preset < IM_ARRAYSIZE(names) ? names[preset]
+                                                         : "Unavailable preset";
+
+    if (ImGui::BeginCombo("NR model", preview))
+    {
+        if (allowInherit && ImGui::Selectable("Inherit pass 1", inherited))
+            *opt = std::optional<uint32_t> {};
+        for (uint32_t value = 0; value < IM_ARRAYSIZE(names); ++value)
+        {
+            const bool selected = !inherited && preset == value;
+            if (ImGui::Selectable(names[value], selected))
+                *opt = value;
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+    HelpMarker("Automatic: use the installed NR runtime's default model.\n"
+               "Original: use the original model (preset 1).\n"
+               "Optimized: use the smaller FP8 model (preset 2), included in NR 310.9.16.0.\n"
+               "Older runtimes fall back to their default when a model is unavailable.\n"
+               "Changing the model rebuilds this pass and resets its history.");
+}
+
 void RenderModel(Config* config)
 {
     bool unlockPasses = config->DlssNrUnlockPasses.value_or_default();
@@ -333,6 +363,7 @@ void RenderModel(Config* config)
     static const char* inheritedStyles[] = { "Auto", "Standard", "Natural", "Cinematic" };
     if (selectedPass == 0)
     {
+        NrModelCombo(&config->DlssNrPreset, false);
         int style = (int) std::min(config->DlssNrStyle.value_or_default(), 2u);
         if (ImGui::Combo("Style", &style, styles, IM_ARRAYSIZE(styles)))
             config->DlssNrStyle = (uint32_t) style;
@@ -342,6 +373,10 @@ void RenderModel(Config* config)
     else
     {
         auto& pass = config->DlssNrPassOverrides[selectedPass - 1];
+        if (selectedPass <= 2)
+            NrModelCombo(&pass.preset, true);
+        else
+            ImGui::TextDisabled("NR model: inherits pass 1");
         int style = pass.style.has_value() ? std::clamp((int) pass.style.value(), 0, 2) + 1 : 0;
         if (ImGui::Combo("Style", &style, inheritedStyles, IM_ARRAYSIZE(inheritedStyles)))
             pass.style = style ? std::optional<uint32_t>(style - 1) : std::nullopt;

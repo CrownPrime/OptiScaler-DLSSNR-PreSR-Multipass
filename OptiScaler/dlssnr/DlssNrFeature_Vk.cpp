@@ -463,12 +463,12 @@ bool ModelVk::Impl::Evaluate(VkCommandBuffer cmdBuffer, const VkImageInfo& colou
         Transition(cmdBuffer, state.motionSmall, VK_IMAGE_LAYOUT_GENERAL);
         // Mode 10 reads depth through the source slot and motion through the model slot; both are
         // the game's images, so both layouts are stated.
-        if (state.pass->Dispatch(cmdBuffer, resize, workWidth, workHeight, depthInfo.ImageView, motionInfo.ImageView,
-                                 VK_NULL_HANDLE, VK_NULL_HANDLE, state.depthSmall.info.ImageView,
-                                 state.motionSmall.info.ImageView,
-                                 frame.DepthReadWrite ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, false, nullptr,
-                                 frame.MotionReadWrite ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL))
+        if (state.pass->Dispatch(
+                cmdBuffer, resize, workWidth, workHeight, depthInfo.ImageView, motionInfo.ImageView, VK_NULL_HANDLE,
+                VK_NULL_HANDLE, state.depthSmall.info.ImageView, state.motionSmall.info.ImageView,
+                frame.DepthReadWrite ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, false, nullptr,
+                frame.MotionReadWrite ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL))
         {
             depthResource = WrapImage(state.depthSmall.info, true);
             motionResource = WrapImage(state.motionSmall.info, true);
@@ -498,9 +498,7 @@ bool ModelVk::Impl::Evaluate(VkCommandBuffer cmdBuffer, const VkImageInfo& colou
     const bool renderMotionScale = cfg.DlssNrRenderMotionScale.value_or_default();
     const uint32_t mvGuideW = !renderMotionScale ? workWidth : matchedGuides ? workWidth : guides.motion.width;
     const uint32_t mvGuideH = !renderMotionScale ? workHeight : matchedGuides ? workHeight : guides.motion.height;
-    const uint32_t mvRefW = !renderMotionScale                 ? width
-                            : frame.MotionVectorsLowResolution ? renderWidth
-                                                               : outputWidth;
+    const uint32_t mvRefW = !renderMotionScale ? width : frame.MotionVectorsLowResolution ? renderWidth : outputWidth;
     const uint32_t mvRefH = !renderMotionScale                 ? height
                             : frame.MotionVectorsLowResolution ? renderHeight
                                                                : outputHeight;
@@ -692,8 +690,8 @@ bool ModelVk::Impl::Evaluate(VkCommandBuffer cmdBuffer, const VkImageInfo& colou
                      !renderMotionScale                 ? "frame size, RenderMotionScale=false"
                      : frame.MotionVectorsLowResolution ? "render size, low-resolution vectors"
                                                         : "output size",
-                     mvGuideW, mvGuideH, matchedGuides ? "matched to the working size" : "the game's region",
-                     workWidth, workHeight);
+                     mvGuideW, mvGuideH, matchedGuides ? "matched to the working size" : "the game's region", workWidth,
+                     workHeight);
     }
     state.spatialRan = spatial.active;
     return true;

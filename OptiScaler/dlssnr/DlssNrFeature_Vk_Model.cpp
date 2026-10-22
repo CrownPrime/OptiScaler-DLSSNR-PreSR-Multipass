@@ -324,16 +324,15 @@ bool ModelVk::Impl::PrepareModels(VkCommandBuffer cmdBuffer, const DlssNrFrameIn
         // depthSmall / motionSmall hold the matched guides below native; they are made whether or
         // not MatchGuides is on, so the switch can be flipped at run time without a resize.
         const bool belowNative = reduced && workWidth < width;
-        const bool ok = CreateImage(state.output, workWidth, workHeight, working) &&
-                        (passes == 1 || (CreateImage(state.scratch, workWidth, workHeight, working) &&
-                                         CreateImage(state.passClamp, workWidth, workHeight, working))) &&
-                        CreateImage(state.proxy, width, height, working) &&
-                        CreateImage(state.keep, width, height, working) &&
-                        (!reduced || CreateImage(state.proxySmall, workWidth, workHeight, working)) &&
-                        (!belowNative ||
-                         (CreateImage(state.depthSmall, workWidth, workHeight, VK_FORMAT_R32_SFLOAT) &&
-                          CreateImage(state.motionSmall, workWidth, workHeight, VK_FORMAT_R32G32B32A32_SFLOAT))) &&
-                        (workScale <= 1.0f || CreateImage(state.outputNative, width, height, working));
+        const bool ok =
+            CreateImage(state.output, workWidth, workHeight, working) &&
+            (passes == 1 || (CreateImage(state.scratch, workWidth, workHeight, working) &&
+                             CreateImage(state.passClamp, workWidth, workHeight, working))) &&
+            CreateImage(state.proxy, width, height, working) && CreateImage(state.keep, width, height, working) &&
+            (!reduced || CreateImage(state.proxySmall, workWidth, workHeight, working)) &&
+            (!belowNative || (CreateImage(state.depthSmall, workWidth, workHeight, VK_FORMAT_R32_SFLOAT) &&
+                              CreateImage(state.motionSmall, workWidth, workHeight, VK_FORMAT_R32G32B32A32_SFLOAT))) &&
+            (workScale <= 1.0f || CreateImage(state.outputNative, width, height, working));
 
         if (!ok)
         {

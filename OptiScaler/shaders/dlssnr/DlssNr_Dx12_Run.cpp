@@ -499,9 +499,9 @@ auto DlssNr_Dx12::State::Run(ID3D12GraphicsCommandList* cmdList, ID3D12Resource*
     modelFrame.depth = depthIn;
     modelFrame.motion = motionIn;
     modelFrame.size = { modelWidth, modelHeight };
-    modelFrame.guides = (spatial || matchedGuides)
-                            ? DlssNr::GuideRegions { { 0, 0, modelWidth, modelHeight }, { 0, 0, modelWidth, modelHeight } }
-                            : guides;
+    modelFrame.guides = (spatial || matchedGuides) ? DlssNr::GuideRegions { { 0, 0, modelWidth, modelHeight },
+                                                                            { 0, 0, modelWidth, modelHeight } }
+                                                   : guides;
     modelFrame.depthInverted = frame.DepthInverted;
     modelFrame.reset = nr.reset;
     modelFrame.mvScaleX = spatial ? 1.0f : frame.MvScaleX * mvToWorkX;

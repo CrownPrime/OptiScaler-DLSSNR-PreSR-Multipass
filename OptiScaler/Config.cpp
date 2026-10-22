@@ -1392,7 +1392,8 @@ bool Config::SaveIni(std::filesystem::path destination)
         ini.SetValue("DlssNr", "ShowSkinMask", GetBoolValue(Instance()->DlssNrShowSkinMask.value_for_config()).c_str());
         ini.SetValue("DlssNr", "UnlockPasses", GetBoolValue(Instance()->DlssNrUnlockPasses.value_for_config()).c_str());
         ini.SetValue("DlssNr", "MatchGuides", GetBoolValue(Instance()->DlssNrMatchGuides.value_for_config()).c_str());
-        ini.SetValue("DlssNr", "RenderMotionScale", GetBoolValue(Instance()->DlssNrRenderMotionScale.value_for_config()).c_str());
+        ini.SetValue("DlssNr", "RenderMotionScale",
+                     GetBoolValue(Instance()->DlssNrRenderMotionScale.value_for_config()).c_str());
         for (unsigned int i = 0; i < std::size(Instance()->DlssNrPassOverrides); ++i)
         {
             auto& pass = Instance()->DlssNrPassOverrides[i];

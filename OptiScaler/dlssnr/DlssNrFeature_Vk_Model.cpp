@@ -367,6 +367,15 @@ bool ModelVk::Impl::PrepareModels(VkCommandBuffer cmdBuffer, const DlssNrFrameIn
         state.reset = true;
     }
 
+    // First use may enable the filter without changing the model. This image
+    // has no previous GPU users when absent; existing images retire on resize.
+    if (DlssNr_Common::HaloEnabled(cfg) && !state.passClamp.Valid() &&
+        !CreateImage(state.passClamp, workWidth, workHeight, VK_FORMAT_R16G16B16A16_SFLOAT))
+    {
+        Fail("the halo filter could not allocate its working image");
+        return false;
+    }
+
     bool created = false;
     for (unsigned int pass = 0; pass < passes; ++pass)
     {

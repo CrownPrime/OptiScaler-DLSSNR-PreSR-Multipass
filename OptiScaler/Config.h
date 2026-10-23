@@ -344,7 +344,7 @@ class Config
     // Maximum pixel brightening/darkening ratio.
     CustomOptional<float> DlssNrMaxRatio { 2.0f };
 
-    // Reduced output: 0 classic, 1/2 matched residual spatial/DLSS, 3/4 lighting + colour spatial/DLSS.
+    // Reduced output: 0 classic, 1/2 residual spatial/DLSS, 3/4 lighting + colour, 5 edge-aware.
     CustomOptional<uint32_t> DlssNrTransfer { 1 };
 
     // 0 normal, 1 model input, 2 model answer, 3 amplified edit.
@@ -387,6 +387,10 @@ class Config
     CustomOptional<float> DlssNrWhitePointScale { 1.0f };
     CustomOptional<float> DlssNrReplaceDetailStrength { 0.0f };
     CustomOptional<float> DlssNrResidualConfidenceSensitivity { 0.0f };
+    CustomOptional<bool> DlssNrHistoryRejection { false };
+    CustomOptional<float> DlssNrHaloSuppression { 0.0f };
+    CustomOptional<float> DlssNrHaloBrightSuppression { 0.0f };
+    CustomOptional<float> DlssNrHaloRadius { 2.0f };
     CustomOptional<uint32_t> DlssNrWhitePointSource { 0u };
     CustomOptional<float> DlssNrWhitePointTrim { 1.0f };
     CustomOptional<float> DlssNrAutoExposureTrim { 5.0f };

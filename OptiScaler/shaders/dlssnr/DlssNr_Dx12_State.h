@@ -211,6 +211,8 @@ struct DlssNr_Dx12::State
             ID3D12Resource* accumulatedEdit[2] {};
             unsigned accumulatedIndex = 0;
             bool accumulationReadable = false, accumulationValid = false;
+            bool historyRejection = false;
+            float historyPreExposure = 1.0f;
             bool smallReadable = false, reset = true, failed = false;
             bool rayReconstruction = false, finishedPicture = false, privateRr = false;
             DlssNr::PrivateUpscaler backend = DlssNr::PrivateUpscaler::DLSS;

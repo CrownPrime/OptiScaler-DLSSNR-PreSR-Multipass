@@ -384,6 +384,10 @@ bool Config::Reload(std::filesystem::path iniPath)
             DlssNrWhitePointScale.set_from_config(readFloat("DlssNr", "WhitePointScale"));
             DlssNrReplaceDetailStrength.set_from_config(readFloat("DlssNr", "ReplaceDetailStrength"));
             DlssNrResidualConfidenceSensitivity.set_from_config(readFloat("DlssNr", "ResidualConfidenceSensitivity"));
+            DlssNrHistoryRejection.set_from_config(readBool("DlssNr", "HistoryRejection"));
+            DlssNrHaloSuppression.set_from_config(readFloat("DlssNr", "HaloSuppression"));
+            DlssNrHaloBrightSuppression.set_from_config(readFloat("DlssNr", "HaloBrightSuppression"));
+            DlssNrHaloRadius.set_from_config(readFloat("DlssNr", "HaloRadius"));
             DlssNrWhitePointSource.set_from_config(readUInt("DlssNr", "WhitePointSource"));
             DlssNrWhitePointTrim.set_from_config(readFloat("DlssNr", "WhitePointTrim"));
             DlssNrAutoExposureTrim.set_from_config(readFloat("DlssNr", "AutoExposureTrim"));
@@ -1358,6 +1362,13 @@ bool Config::SaveIni(std::filesystem::path destination)
                      GetFloatValue(Instance()->DlssNrReplaceDetailStrength.value_for_config()).c_str());
         ini.SetValue("DlssNr", "ResidualConfidenceSensitivity",
                      GetFloatValue(Instance()->DlssNrResidualConfidenceSensitivity.value_for_config()).c_str());
+        ini.SetValue("DlssNr", "HistoryRejection",
+                     GetBoolValue(Instance()->DlssNrHistoryRejection.value_for_config()).c_str());
+        ini.SetValue("DlssNr", "HaloSuppression",
+                     GetFloatValue(Instance()->DlssNrHaloSuppression.value_for_config()).c_str());
+        ini.SetValue("DlssNr", "HaloBrightSuppression",
+                     GetFloatValue(Instance()->DlssNrHaloBrightSuppression.value_for_config()).c_str());
+        ini.SetValue("DlssNr", "HaloRadius", GetFloatValue(Instance()->DlssNrHaloRadius.value_for_config()).c_str());
         ini.SetValue("DlssNr", "WhitePointSource",
                      GetIntValue(Instance()->DlssNrWhitePointSource.value_for_config()).c_str());
         ini.SetValue("DlssNr", "WhitePointTrim",

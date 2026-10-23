@@ -27,9 +27,9 @@
 #include <shaders/Shader_Dx12.h>
 #include <shaders/Shader_Dx12Utils.h>
 
-// A maximal spatial frame uses 11 codec dispatches: meter 2, encode 1, pack 2, clamps 2,
-// unpack 1, private enlargement 2 and resolve 1. Twelve queued frames need 132 slots.
-#define DLSSNR_NUM_OF_HEAPS 132
+// A maximal spatial frame uses 12 codec dispatches: meter 2, encode 1, pack 2, clamps 2,
+// halo filter 1, unpack 1, private enlargement 2 and resolve 1. Twelve queued frames need 144 slots.
+#define DLSSNR_NUM_OF_HEAPS 144
 
 class DlssNr_Dx12 : public Shader_Dx12, public DlssNr_Common
 {

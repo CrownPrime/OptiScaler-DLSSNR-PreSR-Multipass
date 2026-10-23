@@ -179,9 +179,11 @@ void RenderInput(Config* config)
 
         ImGui::BeginDisabled(!reduced);
 
-        static const char* enlargeNames[] = { "Classic", "Matched residual", "Matched residual + DLSS",
-                                              "Lighting + colour", "Lighting + colour + DLSS" };
-        int enlarge = (int) std::min(config->DlssNrTransfer.value_or_default(), 4u);
+        static const char* enlargeNames[] = {
+            "Classic",           "Matched residual",         "Matched residual + DLSS",
+            "Lighting + colour", "Lighting + colour + DLSS", "Edge-aware"
+        };
+        int enlarge = (int) std::min(config->DlssNrTransfer.value_or_default(), 5u);
 
         if (ImGui::Combo("Enlargement", &enlarge, enlargeNames, IM_ARRAYSIZE(enlargeNames)))
             config->DlssNrTransfer = (uint32_t) enlarge;
@@ -190,6 +192,7 @@ void RenderInput(Config* config)
 
         HelpMarker("Below 100%: Lighting + colour resizes lighting gain and colour changes separately, then applies "
                    "them at full resolution. This can reduce resize halos; fully black pixels remain black. "
+                   "Edge-aware uses the original picture's brightness to keep edits on the correct side of edges. "
                    "DLSS modes require post-upscale DX12 processing.");
     }
     static const char* reversibleNames[] = { "Off (soft knee)", "Neutwo proxy + composed", "Neutwo proxy + replace",
@@ -388,7 +391,21 @@ void RenderModel(Config* config)
 void RenderBlend(Config* config)
 {
     if (config->DlssNrResidualAcrossRr.value_or_default())
+    {
+        Checkbox("Reject stale history", config->DlssNrHistoryRejection);
+        HelpMarker("RR residual path: reject old edits when the input changes and limit them to nearby current edits. "
+                   "Can reduce trails. Off keeps the original history filter.");
         Slider("History confidence threshold", config->DlssNrResidualConfidenceSensitivity, 0.0f, 2.0f, "%.3f", 0.0f);
+    }
+    if (ImGui::TreeNode("Halo suppression (experimental)"))
+    {
+        Slider("Dark rims near bright objects", config->DlssNrHaloSuppression, 0.0f, 1.0f, "%.2f", 0.0f);
+        Slider("Dark rims near dark objects", config->DlssNrHaloBrightSuppression, 0.0f, 1.0f, "%.2f", 0.0f);
+        Slider("Halo radius (NR pixels)", config->DlssNrHaloRadius, 1.0f, 4.0f, "%.0f", 2.0f);
+        HelpMarker("Lifts fine dark rims while keeping broad lighting. Both strengths at zero disable the pass. "
+                   "May lighten real shadows; compare the result before keeping it on.");
+        ImGui::TreePop();
+    }
     if (config->DlssNrFinishedPicture.value_or_default() &&
         (config->DlssNrRunBeforeSr.value_or_default() || config->DlssNrDeferredDlss.value_or_default()))
     {

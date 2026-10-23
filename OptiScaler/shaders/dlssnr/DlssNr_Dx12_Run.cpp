@@ -545,6 +545,27 @@ auto DlssNr_Dx12::State::Run(ID3D12GraphicsCommandList* cmdList, ID3D12Resource*
 
     ngxTime->End(cmdList);
 
+    // The last model has finished reading passClamp. Reuse it for the final
+    // chain's halo correction; the base proxy and all model histories stay intact.
+    if (result == NVSDK_NGX_Result_Success && finalAnswer && nr.passClamp && DlssNr_Common::HaloEnabled(cfg) &&
+        cfg.DlssNrDebugView.value_or_default() != 2)
+    {
+        MakeModelWritable(nr.passClamp);
+        DlssNrConstants halo {};
+        halo.Mode = DlssNrMode_SuppressHalo;
+        halo.Width = modelWidth;
+        halo.Height = modelHeight;
+        DlssNr_Common::SetQualityConstants(halo, cfg);
+        if (shader.DispatchPass(cmdList, halo, modelInput, finalAnswer, nullptr, nullptr, nullptr, nr.passClamp,
+                                nullptr))
+        {
+            finalAnswer = nr.passClamp;
+            MakeModelReadable(finalAnswer);
+        }
+        else
+            ReportSkipOnce("halo filter dispatch failed; using the unfiltered model answer");
+    }
+
     nr.reset = clampFailed || finalAnswer == nullptr;
     bool spatialUnpacked = false;
     ID3D12Resource* ordinaryProxy = modelInput;

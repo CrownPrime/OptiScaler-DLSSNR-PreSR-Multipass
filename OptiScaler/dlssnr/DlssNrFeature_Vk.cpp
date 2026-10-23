@@ -571,6 +571,23 @@ bool ModelVk::Impl::Evaluate(VkCommandBuffer cmdBuffer, const VkImageInfo& colou
     resolve.ReplaceDetailStrength = cfg.DlssNrReplaceDetailStrength.value_or_default();
     resolve.ModelWorkScale = workScale;
 
+    if (DlssNr_Common::HaloEnabled(cfg) && cfg.DlssNrDebugView.value_or_default() != 2)
+    {
+        Transition(cmdBuffer, *modelInput, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        Transition(cmdBuffer, *answer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        Transition(cmdBuffer, state.passClamp, VK_IMAGE_LAYOUT_GENERAL);
+        auto halo = resolve;
+        halo.Mode = DlssNrMode_SuppressHalo;
+        halo.Width = workWidth;
+        halo.Height = workHeight;
+        if (!state.pass->Dispatch(cmdBuffer, halo, workWidth, workHeight, modelInput->info.ImageView,
+                                  answer->info.ImageView, VK_NULL_HANDLE, VK_NULL_HANDLE,
+                                  state.passClamp.info.ImageView, VK_NULL_HANDLE,
+                                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL))
+            return false;
+        answer = &state.passClamp;
+    }
+
     // Downsample the model answer to native before composition.
     ImageVk* resolveProxy = modelInput;
     ImageVk* resolveAnswer = answer;
